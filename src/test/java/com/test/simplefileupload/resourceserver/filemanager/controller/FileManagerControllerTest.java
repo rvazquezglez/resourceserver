@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.google.common.io.CharStreams;
 import com.test.simplefileupload.resourceserver.ResourceServerApplication;
+import com.test.simplefileupload.resourceserver.aws.config.AmazonS3Properties;
 import com.test.simplefileupload.resourceserver.aws.service.AmazonS3ClientServiceImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,7 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = "aws.s3Bucket=" + FileManagerControllerTest.BUCKET_NAME)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
 	ResourceServerApplication.class,
@@ -47,7 +48,7 @@ class FileManagerControllerTest {
 
 	static AmazonS3 s3Client;
 
-	private static final String BUCKET_NAME = "mock-bucket";
+	public static final String BUCKET_NAME = "mock-bucket";
 
 	@BeforeAll
 	static void beforeAll() {
@@ -102,17 +103,11 @@ class FileManagerControllerTest {
 	static class MockRestTemplateConfiguration {
 		@Bean
 		@Primary
-		public AmazonS3ClientServiceImpl s3ClientService(String bucketName) {
+		public AmazonS3ClientServiceImpl s3ClientService(AmazonS3Properties amazonS3Properties) {
 			return new AmazonS3ClientServiceImpl(
 				s3Client,
-				bucketName
+				amazonS3Properties
 			);
-		}
-
-		@Bean(name = "s3BucketName")
-		@Primary
-		public String s3BucketName() {
-			return BUCKET_NAME;
 		}
 	}
 }

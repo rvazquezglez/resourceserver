@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.test.simplefileupload.resourceserver.aws.config.AmazonS3Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,25 +23,25 @@ import java.util.Map;
 public class AmazonS3ClientServiceImpl implements AmazonS3ClientService {
 
 	private AmazonS3 amazonS3;
-	private String bucketName;
+	private AmazonS3Properties amazonS3Properties;
 	private static final Logger LOGGER = LoggerFactory.getLogger(AmazonS3ClientServiceImpl.class);
 
-	public AmazonS3ClientServiceImpl(AmazonS3 amazonS3, String bucketName) {
+	public AmazonS3ClientServiceImpl(AmazonS3 amazonS3, AmazonS3Properties amazonS3Properties) {
 		this.amazonS3 = amazonS3;
-		this.bucketName = bucketName;
+		this.amazonS3Properties = amazonS3Properties;
 	}
 
 	@Autowired
 	public AmazonS3ClientServiceImpl(
 		Region region,
 		AWSCredentialsProvider awsCredentialsProvider,
-		String bucketName
+		AmazonS3Properties amazonS3Properties
 	) {
 		this.amazonS3 = AmazonS3ClientBuilder.standard()
 			.withCredentials(awsCredentialsProvider)
 			.withRegion(region.getName())
 			.build();
-		this.bucketName = bucketName;
+		this.amazonS3Properties = amazonS3Properties;
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class AmazonS3ClientServiceImpl implements AmazonS3ClientService {
 			ObjectMetadata objectMetadata = new ObjectMetadata();
 			metadata.forEach(objectMetadata::addUserMetadata);
 			PutObjectRequest putObjectRequest = new PutObjectRequest(
-				bucketName,
+				amazonS3Properties.getS3Bucket(),
 				fileName,
 				multipartFile.getInputStream(),
 				objectMetadata
