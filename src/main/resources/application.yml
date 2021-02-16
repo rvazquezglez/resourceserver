@@ -1,0 +1,12 @@
+cloud:
+  aws:
+    region:
+      static: us-east-1
+      auto: false
+    stack:
+      auto: false
+aws:
+  accessKeyId: access-key
+  accessSecret: secret
+  region: us-east-1
+  s3Bucket: bucket-name
